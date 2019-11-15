@@ -1,0 +1,14 @@
+<view class="page-body">
+  
+    <map
+      class="map"
+      id="myMap"
+      latitude="{{latitude}}"
+      longitude="{{longitude}}"
+      markers="{{markers}}"
+      covers="{{covers}}"
+      show-location="true"
+      scale="4"
+    ></map>
+
+</view>
