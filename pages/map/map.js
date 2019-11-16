@@ -1,4 +1,10 @@
 var companylist = require("../../datas/data.js")
+//是否开启缩放展示markers
+var autoShowMarkers = false
+//当地图缩放到该比例时自动显示markers
+var displayScale = 12
+//地图当前scale
+var mapScale = 4;
 Page({
   data: {
     latitude: 23.099994,
@@ -6,7 +12,7 @@ Page({
     // display: 'ALWAYS',
     display: 'BYCLICK',
     showscale: true,
-    scale: 4,
+    scale: mapScale,
     markers: [],
   },
   onReady: function(e) {
@@ -17,7 +23,6 @@ Page({
     var marks = []
     for (var item in companylist.data) {
       var data = companylist.data[item];
-
       var markerItem = {
         longitude: data[3],
         latitude: data[4],
@@ -82,28 +87,46 @@ Page({
   },
   bindregionchange: function(e) {
     var that = this;
-    // if (e.causedBy === 'scale') {
-    //   this.mapCtx.getScale({
-    //     success: function(e) {
-          
-    //       if (e.scale > 7) {
-    //         console.log(e.scale)
-    //         that.setData({
-    //           display: 'ALWAYS',
-    //           markers: that.data.markers
-    //         })
-    //       } else {
-    //         that.setData({
-    //           display: 'BYCLICK'
-    //         })
-
-    //       }
-    //     }
-    //   })
-    //   // console.log(e.scale);
-    // }
+    if (!autoShowMarkers) return
+    if (e.causedBy === 'scale') {
+      this.mapCtx.getScale({
+        success: function(e) {
+          that.change_markers_display(e)
+          console.log(e.scale);
+        }
+      })
+      
+    }
   },
+  change_markers_display: function(e) {
+    // this.setData({
+    //   scale:e.scale
+    // })
+    // this.data.scale = e.scale
+    var changeflag = false;
+    var display;
+    console.log(e.scale + "  " + mapScale)
+    if (e.scale > displayScale && mapScale <= displayScale) {
+      changeflag = true
+      display = 'ALWAYS'
 
+
+    } else if (e.scale <= displayScale && mapScale > displayScale) {
+      changeflag = true
+      display = 'BYCLICK'
+    }
+    if (changeflag) {
+      mapScale = e.scale
+      this.data.display = display;
+      for (var item in this.data.markers) {
+        this.data.markers[item].callout.display = this.data.display
+      }
+      this.setData({
+        display: this.data.display,
+        markers: this.data.markers
+      })
+    }
+  },
   regionchange: function(e) {
 
 
